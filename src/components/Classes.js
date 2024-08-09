@@ -1,30 +1,37 @@
-// src/components/Classes.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
+import { ListGroup, Container } from 'react-bootstrap';
 import { BASE_URL } from '../settings';
 
 const Classes = () => {
     const [classes, setClasses] = useState([]);
 
     useEffect(() => {
-        axios.get(`${BASE_URL}/classes`)
-            .then(response => {
+        const fetchClasses = async () => {
+            try {
+                const response = await axios.get(`${BASE_URL}/classes`);
+                console.log (response.data);
                 setClasses(response.data);
-            })
-            .catch(error => {
-                console.error('There was an error fetching the classes!', error);
-            });
+            } catch (error) {
+                console.error('There was an error fetching the classes!',BASE_URL, error);
+            }
+        };
+
+        fetchClasses();
     }, []);
 
     return (
-        <div>
+        <Container>
             <h1>Classes</h1>
-            <ul>
+            <ListGroup>
                 {classes.map(classItem => (
-                    <li key={classItem.id}>{classItem.name}</li>
+                    <ListGroup.Item key={classItem.classId}>
+                        <Link to={`/classes/${classItem.classId}`}>{classItem.name}</Link>
+                    </ListGroup.Item>
                 ))}
-            </ul>
-        </div>
+            </ListGroup>
+        </Container>
     );
 };
 

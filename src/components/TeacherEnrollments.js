@@ -1,0 +1,56 @@
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
+import { Link } from 'react-router-dom';
+import { BASE_URL } from '../settings';
+import { Table, Button } from 'react-bootstrap';
+
+const TeacherEnrollments = () => {
+    const [teacherEnrollments, setTeacherEnrollments] = useState([]);
+
+    useEffect(() => {
+        axios.get(`${BASE_URL}/TeacherEnrollments`)
+            .then(response => {
+                console.log(response.data); // Logging the data
+                setTeacherEnrollments(response.data);
+            })
+            .catch(error => console.error('Error fetching teacher enrollments:', error));
+    }, []);
+
+    const deleteTeacherEnrollment = id => {
+        axios.delete(`${BASE_URL}/TeacherEnrollments/${id}`)
+            .then(() => setTeacherEnrollments(teacherEnrollments.filter(enrollment => enrollment.enrollmentRef !== id)))
+            .catch(error => console.error('Error deleting teacher enrollment:', error));
+    };
+
+    return (
+        <div>
+            <h1>Teacher Enrollments</h1>
+            <Button as={Link} to="/teacher-enrollments/add" variant="primary">Add Teacher Enrollment</Button>
+            <Table striped bordered hover>
+                <thead>
+                    <tr>
+                        <th>Class</th>
+                        <th>Teacher</th>
+                        <th>Lesson</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {teacherEnrollments.map(enrollment => (
+                        <tr key={enrollment.enrollmentRef}>
+                            <td>{enrollment.assignedClass}</td>
+                            <td>{enrollment.enrolledTeacher}</td>
+                            <td>{enrollment.assignedLesson}</td>
+                            <td>
+                                <Button as={Link} to={`/teacher-enrollments/edit/${enrollment.enrollmentRef}`} variant="warning">Edit</Button>
+                                <Button onClick={() => deleteTeacherEnrollment(enrollment.enrollmentRef)} variant="danger">Delete</Button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </Table>
+        </div>
+    );
+};
+
+export default TeacherEnrollments;

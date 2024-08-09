@@ -1,29 +1,51 @@
-// src/components/Students.js
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import { Link } from 'react-router-dom';
 import { BASE_URL } from '../settings';
+import { Table, Button } from 'react-bootstrap';
 
 const Students = () => {
     const [students, setStudents] = useState([]);
 
     useEffect(() => {
         axios.get(`${BASE_URL}/students`)
-            .then(response => {
-                setStudents(response.data);
-            })
-            .catch(error => {
-                console.error('There was an error fetching the students!', error);
-            });
+            .then(response => setStudents(response.data))
+            .catch(error => console.error('Error fetching students:', error));
     }, []);
+
+    const deleteStudent = id => {
+        axios.delete(`${BASE_URL}/students/${id}`)
+            .then(() => setStudents(students.filter(student => student.studentId !== id)))
+            .catch(error => console.error('Error deleting student:', error));
+    };
 
     return (
         <div>
             <h1>Students</h1>
-            <ul>
-                {students.map(student => (
-                    <li key={student.id}>{student.firstName} {student.lastName}</li>
-                ))}
-            </ul>
+            <Button as={Link} to="/students/add" variant="primary">Add Student</Button>
+            <Table striped bordered hover>
+                <thead>
+                    <tr>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Date of Birth</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {students.map(student => (
+                        <tr key={student.studentId}>
+                            <td>{student.firstName}</td>
+                            <td>{student.lastName}</td>
+                            <td>{student.dateOfBirth}</td>
+                            <td>
+                                <Button as={Link} to={`/students/edit/${student.studentId}`} variant="warning">Edit</Button>
+                                <Button onClick={() => deleteStudent(student.studentId)} variant="danger">Delete</Button>
+                            </td>
+                        </tr>
+                    ))}
+                </tbody>
+            </Table>
         </div>
     );
 };
