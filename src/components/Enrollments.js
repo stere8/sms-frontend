@@ -47,8 +47,8 @@ const Enrollments = () => {
                             <td>{enrollment.enrolledClass}</td>
                             <td>{enrollment.enrolledStudent}</td>
                             <td>
-                                <Button as={Link} to={`/enrollments/edit/${enrollment.enrollmentId}`} variant="warning">Edit</Button>
-                                <Button onClick={() => deleteEnrollment(enrollment.enrollmentId)} variant="danger">Delete</Button>
+                                <Button as={Link} to={`/enrollments/edit/${enrollment.enrollmentRef}`} variant="warning">Edit</Button>
+                                <Button onClick={() => deleteEnrollment(enrollment.enrollmentRef)} variant="danger">Delete</Button>
                             </td>
                         </tr>
                     ))}

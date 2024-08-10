@@ -7,8 +7,10 @@ import { Form, Button } from 'react-bootstrap';
 const AddEditTeacherEnrollment = () => {
     const [teachers, setTeachers] = useState([]);
     const [classes, setClasses] = useState([]);
+    const [lessons, setLessons] = useState([]);
     const [teacherId, setTeacherId] = useState('');
     const [classId, setClassId] = useState('');
+    const [lessonId, setLessonId] = useState('');
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -21,11 +23,16 @@ const AddEditTeacherEnrollment = () => {
             .then(response => setClasses(response.data))
             .catch(error => console.error('Error fetching classes:', error));
 
-        if (id) {
-            axios.get(`${BASE_URL}/teacher-enrollments/${id}`)
+        axios.get(`${BASE_URL}/lessons`)
+            .then(response => setLessons(response.data))
+            .catch(error => console.error('Error fetching lessons:', error));
+
+        if (id && id !== '0') {
+            axios.get(`${BASE_URL}/teacherenrollments/${id}`)
                 .then(response => {
                     setTeacherId(response.data.staffId);
                     setClassId(response.data.classId);
+                    setLessonId(response.data.lessonId);
                 })
                 .catch(error => console.error('Error fetching enrollment:', error));
         }
@@ -33,14 +40,14 @@ const AddEditTeacherEnrollment = () => {
 
     const handleSubmit = event => {
         event.preventDefault();
-        const enrollment = { staffId: teacherId, classId: classId };
+        const enrollment = { staffId: teacherId, classId: classId, lessonId: lessonId,TeacherEnrollmentId : id };
 
-        if (id) {
-            axios.put(`${BASE_URL}/teacher-enrollments/${id}`, enrollment)
+        if (id && id !== '0') {
+            axios.put(`${BASE_URL}/teacherenrollments/${id}`, enrollment)
                 .then(() => navigate('/teacher-enrollments'))
                 .catch(error => console.error('Error updating enrollment:', error));
         } else {
-            axios.post(`${BASE_URL}/teacher-enrollments`, enrollment)
+            axios.post(`${BASE_URL}/teacherenrollments`, enrollment)
                 .then(() => navigate('/teacher-enrollments'))
                 .catch(error => console.error('Error creating enrollment:', error));
         }
@@ -48,7 +55,7 @@ const AddEditTeacherEnrollment = () => {
 
     return (
         <div>
-            <h1>{id ? 'Edit Teacher Enrollment' : 'Add Teacher Enrollment'}</h1>
+            <h1>{id && id !== '0' ? 'Edit Teacher Enrollment' : 'Add Teacher Enrollment'}</h1>
             <Form onSubmit={handleSubmit}>
                 <Form.Group controlId="teacherSelect">
                     <Form.Label>Teacher</Form.Label>
@@ -72,8 +79,19 @@ const AddEditTeacherEnrollment = () => {
                         ))}
                     </Form.Control>
                 </Form.Group>
+                <Form.Group controlId="lessonSelect">
+                    <Form.Label>Lesson</Form.Label>
+                    <Form.Control as="select" value={lessonId} onChange={e => setLessonId(e.target.value)} required>
+                        <option value="">Select a lesson</option>
+                        {lessons.map(lesson => (
+                            <option key={lesson.lessonId} value={lesson.lessonId}>
+                                {lesson.name}
+                            </option>
+                        ))}
+                    </Form.Control>
+                </Form.Group>
                 <Button variant="primary" type="submit">
-                    {id ? 'Update Enrollment' : 'Add Enrollment'}
+                    {id && id !== '0' ? 'Update Enrollment' : 'Add Enrollment'}
                 </Button>
             </Form>
         </div>

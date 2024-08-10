@@ -33,14 +33,13 @@ const AddEditEnrollment = () => {
 
     const handleSubmit = event => {
         event.preventDefault();
-        const enrollmentData = { classId, studentId };
 
         if (id) {
-            axios.put(`${BASE_URL}/enrollments/${id}`, enrollmentData)
+            axios.put(`${BASE_URL}/enrollments/${id}`,  { classId, studentId, enrollmentId : id })
                 .then(() => history.push('/enrollments'))
                 .catch(error => console.error('Error updating enrollment:', error));
         } else {
-            axios.post(`${BASE_URL}/enrollments`, enrollmentData)
+            axios.post(`${BASE_URL}/enrollments`,  { classId, studentId })
                 .then(() => history.push('/enrollments'))
                 .catch(error => console.error('Error adding enrollment:', error));
         }

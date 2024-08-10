@@ -10,7 +10,7 @@ const TeacherEnrollments = () => {
     useEffect(() => {
         axios.get(`${BASE_URL}/TeacherEnrollments`)
             .then(response => {
-                console.log(response.data); // Logging the data
+                console.log(response); // Logging the data
                 setTeacherEnrollments(response.data);
             })
             .catch(error => console.error('Error fetching teacher enrollments:', error));
@@ -38,12 +38,18 @@ const TeacherEnrollments = () => {
                 <tbody>
                     {teacherEnrollments.map(enrollment => (
                         <tr key={enrollment.enrollmentRef}>
-                            <td>{enrollment.assignedClass}</td>
-                            <td>{enrollment.enrolledTeacher}</td>
-                            <td>{enrollment.assignedLesson}</td>
+                            <td>{enrollment.assignedClass || 'N/A'}</td>
+                            <td>{enrollment.enrolledTeacher || 'N/A'}</td>
+                            <td>{enrollment.assignedLesson || 'N/A'}</td>
                             <td>
-                                <Button as={Link} to={`/teacher-enrollments/edit/${enrollment.enrollmentRef}`} variant="warning">Edit</Button>
-                                <Button onClick={() => deleteTeacherEnrollment(enrollment.enrollmentRef)} variant="danger">Delete</Button>
+                                {enrollment.enrollmentRef !== 0 ? (
+                                    <>
+                                        <Button as={Link} to={`/teacher-enrollments/edit/${enrollment.enrollmentRef}`} variant="warning">Edit</Button>
+                                        <Button onClick={() => deleteTeacherEnrollment(enrollment.enrollmentRef)} variant="danger">Delete</Button>
+                                    </>
+                                ) : (
+                                    'N/A'
+                                )}
                             </td>
                         </tr>
                     ))}

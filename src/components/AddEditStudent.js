@@ -64,7 +64,7 @@ const AddEditStudent = () => {
                     <Form.Control
                         type="date"
                         name="dateOfBirth"
-                        value={student.dateOfBirth}
+                        value={Date(student.dateOfBirth)}
                         onChange={handleChange}
                         required
                     />
