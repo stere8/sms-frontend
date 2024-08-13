@@ -5,7 +5,7 @@ import { BASE_URL } from '../settings';
 import { Form, Button, Container } from 'react-bootstrap';
 
 const AddEditLesson = () => {
-    const [lesson, setLesson] = useState({ name: '', description: '' });
+    const [lesson, setLesson] = useState({ lessonId: 0, name: '', description: '', subject: '', gradeLevel: '' });
     const navigate = useNavigate();
     const { id } = useParams();
 
@@ -55,6 +55,26 @@ const AddEditLesson = () => {
                         type="text"
                         name="description"
                         value={lesson.description}
+                        onChange={handleChange}
+                        required
+                    />
+                </Form.Group>
+                <Form.Group controlId="subject">
+                    <Form.Label>Subject</Form.Label>
+                    <Form.Control
+                        type="text"
+                        name="subject"
+                        value={lesson.subject}
+                        onChange={handleChange}
+                        required
+                    />
+                </Form.Group>
+                <Form.Group controlId="gradeLevel">
+                    <Form.Label>Grade Level</Form.Label>
+                    <Form.Control
+                        type="text"
+                        name="gradeLevel"
+                        value={lesson.gradeLevel}
                         onChange={handleChange}
                         required
                     />

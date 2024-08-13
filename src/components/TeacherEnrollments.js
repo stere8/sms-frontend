@@ -7,18 +7,22 @@ import { Table, Button } from 'react-bootstrap';
 const TeacherEnrollments = () => {
     const [teacherEnrollments, setTeacherEnrollments] = useState([]);
 
-    useEffect(() => {
+    const fetchTeacherEnrollments = () => {
         axios.get(`${BASE_URL}/TeacherEnrollments`)
             .then(response => {
                 console.log(response); // Logging the data
                 setTeacherEnrollments(response.data);
             })
             .catch(error => console.error('Error fetching teacher enrollments:', error));
+    };
+
+    useEffect(() => {
+        fetchTeacherEnrollments();
     }, []);
 
     const deleteTeacherEnrollment = id => {
         axios.delete(`${BASE_URL}/TeacherEnrollments/${id}`)
-            .then(() => setTeacherEnrollments(teacherEnrollments.filter(enrollment => enrollment.enrollmentRef !== id)))
+            .then(() => fetchTeacherEnrollments()) // Refetch after delete
             .catch(error => console.error('Error deleting teacher enrollment:', error));
     };
 

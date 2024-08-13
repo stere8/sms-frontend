@@ -11,9 +11,7 @@ const Enrollments = () => {
         const fetchEnrollments = async () => {
             try {
                 const link = `${BASE_URL}/enrollments`
-                console.log(link)
                 const response = await axios.get(link);
-                console.log(response.data);  // Log the data
                 setEnrollments(response.data);
             } catch (error) {
                 console.error('There was an error fetching the enrollments!', error);
@@ -25,7 +23,12 @@ const Enrollments = () => {
 
     const deleteEnrollment = id => {
         axios.delete(`${BASE_URL}/enrollments/${id}`)
-            .then(() => setEnrollments(enrollments.filter(enrollment => enrollment.enrollmentId !== id)))
+            .then(() => {
+                // Re-fetch the enrollments after successful deletion
+                axios.get(`${BASE_URL}/enrollments`)
+                    .then(response => setEnrollments(response.data))
+                    .catch(error => console.error('Error fetching enrollments:', error));
+            })
             .catch(error => console.error('Error deleting enrollment:', error));
     };
 

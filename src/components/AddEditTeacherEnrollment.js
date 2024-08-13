@@ -73,8 +73,8 @@ const AddEditTeacherEnrollment = () => {
                     <Form.Control as="select" value={classId} onChange={e => setClassId(e.target.value)} required>
                         <option value="">Select a class</option>
                         {classes.map(classItem => (
-                            <option key={classItem.classId} value={classItem.classId}>
-                                {classItem.name}
+                            <option key={classItem.viewedClass.classId} value={classItem.viewedClass.classId}>
+                                {classItem.viewedClass.name}
                             </option>
                         ))}
                     </Form.Control>

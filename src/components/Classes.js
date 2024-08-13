@@ -26,8 +26,8 @@ const Classes = () => {
             <h1>Classes</h1>
             <ListGroup>
                 {classes.map(classItem => (
-                    <ListGroup.Item key={classItem.classId}>
-                        <Link to={`/classes/${classItem.classId}`}>{classItem.name}</Link>
+                    <ListGroup.Item key={classItem.viewedClass.classId}>
+                        <Link to={`/classes/${classItem.viewedClass.classId}`}>{classItem.viewedClass.name}</Link>
                     </ListGroup.Item>
                 ))}
             </ListGroup>

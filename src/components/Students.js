@@ -19,6 +19,10 @@ const Students = () => {
             .catch(error => console.error('Error deleting student:', error));
     };
 
+    const formatDate = date => {
+        return date ? date.split('T')[0] : '';
+    };
+
     return (
         <div>
             <h1>Students</h1>
@@ -37,7 +41,7 @@ const Students = () => {
                         <tr key={student.studentId}>
                             <td>{student.firstName}</td>
                             <td>{student.lastName}</td>
-                            <td>{student.dateOfBirth}</td>
+                            <td>{formatDate(student.dateOfBirth)}</td>
                             <td>
                                 <Button as={Link} to={`/students/edit/${student.studentId}`} variant="warning">Edit</Button>
                                 <Button onClick={() => deleteStudent(student.studentId)} variant="danger">Delete</Button>

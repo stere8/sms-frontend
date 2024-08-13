@@ -9,7 +9,7 @@ const AddEditEnrollment = () => {
     const [students, setStudents] = useState([]);
     const [classId, setClassId] = useState('');
     const [studentId, setStudentId] = useState('');
-    const history = useNavigate();
+    const navigate = useNavigate();  // Correct usage of useNavigate
     const { id } = useParams();
 
     useEffect(() => {
@@ -34,13 +34,15 @@ const AddEditEnrollment = () => {
     const handleSubmit = event => {
         event.preventDefault();
 
+        const enrollmentData = { classId, studentId, enrollmentId: id };
+
         if (id) {
-            axios.put(`${BASE_URL}/enrollments/${id}`,  { classId, studentId, enrollmentId : id })
-                .then(() => history.push('/enrollments'))
+            axios.put(`${BASE_URL}/enrollments/${id}`, enrollmentData)
+                .then(() => navigate('/enrollments'))  // Correct usage of navigate
                 .catch(error => console.error('Error updating enrollment:', error));
         } else {
-            axios.post(`${BASE_URL}/enrollments`,  { classId, studentId })
-                .then(() => history.push('/enrollments'))
+            axios.post(`${BASE_URL}/enrollments`, enrollmentData)
+                .then(() => navigate('/enrollments'))  // Correct usage of navigate
                 .catch(error => console.error('Error adding enrollment:', error));
         }
     };
@@ -54,7 +56,7 @@ const AddEditEnrollment = () => {
                     <Form.Control as="select" value={classId} onChange={e => setClassId(e.target.value)}>
                         <option value="">Select Class</option>
                         {classes.map(cls => (
-                            <option key={cls.classId} value={cls.classId}>{cls.name}</option>
+                            <option key={cls.viewedClass.classId} value={cls.viewedClass.classId}>{cls.viewedClass.name}</option>
                         ))}
                     </Form.Control>
                 </Form.Group>

@@ -12,7 +12,11 @@ const AddEditStudent = () => {
     useEffect(() => {
         if (id) {
             axios.get(`${BASE_URL}/students/${id}`)
-                .then(response => setStudent(response.data))
+                .then(response => {
+                    const studentData = response.data;
+                    studentData.dateOfBirth = studentData.dateOfBirth.split('T')[0]; // Format date as yyyy-mm-dd
+                    setStudent(studentData);
+                })
                 .catch(error => console.error('Error fetching student data:', error));
         }
     }, [id]);
@@ -64,7 +68,7 @@ const AddEditStudent = () => {
                     <Form.Control
                         type="date"
                         name="dateOfBirth"
-                        value={Date(student.dateOfBirth)}
+                        value={student.dateOfBirth}
                         onChange={handleChange}
                         required
                     />
