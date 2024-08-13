@@ -6,6 +6,7 @@ import { Table, Dropdown, Button } from 'react-bootstrap';
 const Timetable = () => {
     const [classes, setClasses] = useState([]);
     const [selectedClass, setSelectedClass] = useState(null);
+    const [selectedClassName, setSelectedClassName] = useState('');
     const [timetable, setTimetable] = useState([]);
     const [lessons, setLessons] = useState([]);
     const timeSlots = ['08:00 - 09:00', '09:00 - 10:00', '10:30 - 11:30', '11:30 - 12:30', '13:30 - 14:30', '14:30 - 15:30'];
@@ -26,16 +27,6 @@ const Timetable = () => {
 
     useEffect(() => {
         if (selectedClass) {
-            const fetchTimetable = async () => {
-                try {
-                    const response = await axios.get(`${BASE_URL}/timetable/class/${selectedClass}`);
-                    const timetableData = createDefaultTimetable(response.data);
-                    setTimetable(timetableData);
-                } catch (error) {
-                    console.error('There was an error fetching the timetable!', error);
-                }
-            };
-
             fetchTimetable();
         }
     }, [selectedClass]);
@@ -56,17 +47,28 @@ const Timetable = () => {
         }
     }, [selectedClass, classes]);
 
+    const fetchTimetable = async () => {
+        try {
+            const response = await axios.get(`${BASE_URL}/timetable/class/${selectedClass}`);
+            const timetableData = createDefaultTimetable(response.data);
+            setTimetable(timetableData);
+        } catch (error) {
+            console.error('There was an error fetching the timetable!', error);
+        }
+    };
+
     const createDefaultTimetable = (data) => {
         let defaultTimetable = [];
 
         days.forEach(day => {
             timeSlots.forEach(slot => {
-                const existingEntry = data.find(item => item.day === day && item.slot === slot);
+                const [startTime, endTime] = slot.split(' - ').map(time => time + ':00');
+                const existingEntry = data.find(item => item.dayOfWeek === day && item.startTime === startTime && item.endTime === endTime);
                 defaultTimetable.push({
                     day,
                     slot,
                     lessonId: existingEntry ? existingEntry.lessonId : null,
-                    id: existingEntry ? existingEntry.id : null,  // Assuming each timetable entry has an ID
+                    id: existingEntry ? existingEntry.timetableId : null,  // Assuming each timetable entry has an ID
                 });
             });
         });
@@ -74,8 +76,9 @@ const Timetable = () => {
         return defaultTimetable;
     };
 
-    const handleClassSelect = (classId) => {
+    const handleClassSelect = (classId, className) => {
         setSelectedClass(classId);
+        setSelectedClassName(className);
     };
 
     const handleLessonChange = (day, slot, lessonId) => {
@@ -86,16 +89,47 @@ const Timetable = () => {
     };
 
     const handleSave = (entry) => {
+        const timetableEntry = {
+            classId: selectedClass,
+            lessonId: entry.lessonId,
+            dayOfWeek: entry.day,
+            startTime: entry.slot.split(' - ')[0] + ':00',
+            endTime: entry.slot.split(' - ')[1] + ':00'
+        };
+
+
+        console.log('Saving timetable entry:', timetableEntry);
+
         if (entry.id) {
-            // Update existing timetable entry
-            axios.put(`${BASE_URL}/timetable/${entry.id}`, entry)
-                .then(() => console.log('Timetable entry updated successfully'))
-                .catch(error => console.error('Error updating timetable entry:', error));
+            timetableEntry.timetableId = entry.id;
+            axios.put(`${BASE_URL}/timetable/${entry.id}`, timetableEntry)
+                .then(() => {
+                    console.log('Timetable entry updated successfully');
+                    fetchTimetable();
+                })
+                .catch(error => {
+                    console.error('Error updating timetable entry:', error);
+                    if (error.response) {
+                        console.error('Server response:', error.response.data);
+                    }
+                });
         } else {
-            // Create new timetable entry
-            axios.post(`${BASE_URL}/timetable`, entry)
-                .then(() => console.log('Timetable entry created successfully'))
-                .catch(error => console.error('Error creating timetable entry:', error));
+            axios.post(`${BASE_URL}/timetable`, timetableEntry)
+                .then((response) => {
+                    console.log('Timetable entry created successfully');
+                    const updatedTimetable = timetable.map(t => 
+                        t.day === entry.day && t.slot === entry.slot 
+                            ? { ...t, id: response.data.timetableId } 
+                            : t
+                    );
+                    setTimetable(updatedTimetable);
+                })
+                .catch(error => {
+                    console.error('Error creating timetable entry:', error);
+                    if (error.response) {
+                        console.error('Server response:', error.response.data);
+                    }
+                });
         }
     };
 
@@ -110,13 +144,15 @@ const Timetable = () => {
                     {classes.map(c => (
                         <Dropdown.Item 
                             key={c.viewedClass.classId} 
-                            onClick={() => handleClassSelect(c.viewedClass.classId)}
+                            onClick={() => handleClassSelect(c.viewedClass.classId, c.viewedClass.name)}
                         >
                             {c.viewedClass.name}
                         </Dropdown.Item>
                     ))}
                 </Dropdown.Menu>
             </Dropdown>
+
+            {selectedClassName && <h2>Selected Class: {selectedClassName}</h2>}
 
             {selectedClass && (
                 <Table striped bordered hover>
