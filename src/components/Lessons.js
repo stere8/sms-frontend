@@ -28,6 +28,8 @@ const Lessons = () => {
                     <tr>
                         <th>Name</th>
                         <th>Description</th>
+                        <th>Subject</th>
+                        <th>Grade Level</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -36,6 +38,8 @@ const Lessons = () => {
                         <tr key={lesson.lessonId}>
                             <td>{lesson.name}</td>
                             <td>{lesson.description}</td>
+                            <td>{lesson.subject}</td>
+                            <td>{lesson.gradeLevel}</td>
                             <td>
                                 <Button as={Link} to={`/lessons/edit/${lesson.lessonId}`} variant="warning">Edit</Button>
                                 <Button onClick={() => deleteLesson(lesson.lessonId)} variant="danger">Delete</Button>

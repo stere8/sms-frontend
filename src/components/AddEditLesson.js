@@ -70,15 +70,17 @@ const AddEditLesson = () => {
                     />
                 </Form.Group>
                 <Form.Group controlId="gradeLevel">
-                    <Form.Label>Grade Level</Form.Label>
-                    <Form.Control
-                        type="text"
-                        name="gradeLevel"
-                        value={lesson.gradeLevel}
-                        onChange={handleChange}
-                        required
-                    />
-                </Form.Group>
+    <Form.Label>Grade Level</Form.Label>
+    <Form.Control
+        type="number"
+        name="gradeLevel"
+        value={lesson.gradeLevel}
+        onChange={handleChange}
+        required
+        min={0}
+        max={12}
+    />
+</Form.Group>
                 <Button variant="primary" type="submit">
                     {id ? 'Update' : 'Add'}
                 </Button>

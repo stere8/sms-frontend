@@ -8,9 +8,18 @@ const Students = () => {
     const [students, setStudents] = useState([]);
 
     useEffect(() => {
-        axios.get(`${BASE_URL}/students`)
-            .then(response => setStudents(response.data))
-            .catch(error => console.error('Error fetching students:', error));
+        const fetchStudents = async () => {
+            try {
+                const url = `${BASE_URL}/students`
+                const response = await axios.get(url);
+                console.log(response.data);
+                setStudents(response.data);
+            } catch (error) {
+                console.error('There was an error fetching the students!', BASE_URL, error);
+            }
+        };
+
+        fetchStudents();
     }, []);
 
     const deleteStudent = id => {
