@@ -59,6 +59,8 @@ const DashboardFrontPage = () => {
   useEffect(() => {
     let endpoint = "";
     console.log(userRole)
+    
+    console.log(userId)
     if (userRole === "Admin") {
       endpoint = `/api/dashboard/admin`;
     } else if (userRole === "Teacher") {
@@ -73,6 +75,7 @@ const DashboardFrontPage = () => {
       return;
     }
 
+    
     axiosInstance.get(endpoint)
       .then((res) => {
         setDashboardData(res.data);

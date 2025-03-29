@@ -14,7 +14,7 @@ const Login = () => {
     e.preventDefault();
     setError("");
     try {
-      const response = await axios.post(`${BASE_URL}/api/account/login`, { email, password });
+      const response = await axios.post(`${BASE_URL}/api/account/login`, { email, password },{withCredentials:true});
       // On success, you can store the returned user data in local storage or context.
       console.log("Login successful:", response.data);
       localStorage.setItem("user", JSON.stringify(response.data));
