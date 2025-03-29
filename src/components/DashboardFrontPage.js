@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from "react";
-import axios from "axios";
+import axiosInstance from "./axiosInstance"; // Updated to use axiosInstance
 import { BASE_URL } from "../settings";
 
 // Dummy context—replace with your actual AuthContext
@@ -9,7 +9,6 @@ const AuthContext = React.createContext({
 });
 
 // Stub components for each dashboard view
-
 const AdminDashboard = ({ data }) => (
   <div>
     <h2>Admin Dashboard</h2>
@@ -59,21 +58,22 @@ const DashboardFrontPage = () => {
 
   useEffect(() => {
     let endpoint = "";
+    console.log(userRole)
     if (userRole === "Admin") {
-      endpoint = `${BASE_URL}/api/dashboard/admin`;
+      endpoint = `/api/dashboard/admin`;
     } else if (userRole === "Teacher") {
-      endpoint = `${BASE_URL}/api/dashboard/teacher/${userId}`;
+      endpoint = `/api/dashboard/teacher/${userId}`;
     } else if (userRole === "Parent") {
-      endpoint = `${BASE_URL}/api/dashboard/parent/${userId}`;
+      endpoint = `/api/dashboard/parent/${userId}`;
     } else if (userRole === "Student") {
-      endpoint = `${BASE_URL}/api/dashboard/student/${userId}`;
+      endpoint = `/api/dashboard/student/${userId}`;
     } else {
       setError("User role not recognized.");
       setLoading(false);
       return;
     }
 
-    axios.get(endpoint)
+    axiosInstance.get(endpoint)
       .then((res) => {
         setDashboardData(res.data);
         setLoading(false);

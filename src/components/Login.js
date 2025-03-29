@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { BASE_URL } from '../settings';
+
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -12,7 +14,7 @@ const Login = () => {
     e.preventDefault();
     setError("");
     try {
-      const response = await axios.post("/api/account/login", { email, password });
+      const response = await axios.post(`${BASE_URL}/api/account/login`, { email, password });
       // On success, you can store the returned user data in local storage or context.
       console.log("Login successful:", response.data);
       localStorage.setItem("user", JSON.stringify(response.data));
