@@ -13,6 +13,7 @@ const ClassDetails = () => {
             try {
                 const response = await axios.get(`${BASE_URL}/classes/${id}`);
                 setClassDetails(response.data);
+                console.log(response.data)
             } catch (error) {
                 console.error('There was an error fetching the class details!', error);
             }
