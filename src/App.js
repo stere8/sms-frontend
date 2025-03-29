@@ -17,12 +17,20 @@ import TeacherEnrollments from './components/TeacherEnrollments';
 import AddEditLesson from './components/AddEditLesson';
 import AddEditAttendance from './components/AddEditAttendance';
 import AddEditMark from './components/AddEditMark';
+import DashboardFrontPage from './components/DashboardFrontPage'; // Adjust the path if needed
+import Login from './components/Login';
+import Register from './components/Register';
 
 function App() {
     return (
         <Router>
             <Navbar />
             <Routes>
+                {/* Dashboard Route */}
+                <Route path="/dashboard" element={<DashboardFrontPage />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
+
                 {/* Attendance Routes */}
                 <Route path="/attendance" element={<Attendance />} />
                 <Route path="/attendance/add" element={<AddEditAttendance />} />
