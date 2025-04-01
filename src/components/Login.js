@@ -1,28 +1,30 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
-import { BASE_URL } from '../settings';
-
+// src/components/Login.js
+import React, {useContext, useState} from "react";
+import axiosInstance from "./axiosInstance";
+import { useNavigate } from "react-router-dom";
+import { AuthContext } from './AuthContext';
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
+  const token = localStorage.getItem("authToken");
+  const { setAuthInfo } = useContext(AuthContext);
+
+  if(token){
+    navigate("/dashboard")
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     try {
-      axios.post(`${BASE_URL}/api/account/login`, { email, password })
-      .then(res => {
-        localStorage.setItem('authToken', res.data.token);
-        navigate("/dashboard");
-      })
-      .catch(err => console.error(err));
-          // On success, you can store the returned user data in local storage or context.
-  
-      // Redirect user based on their role or to a default dashboard.
+      const response = await axiosInstance.post("/api/account/login", { email, password });
+      console.log("Login successful:", response.data);
+      localStorage.setItem("authToken", response.data.token);
+      console.log('setAuthInfo ing');
+      setAuthInfo(response.data.token);
       navigate("/dashboard");
     } catch (err) {
       console.error(err);

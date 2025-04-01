@@ -20,6 +20,9 @@ import AddEditMark from './components/AddEditMark';
 import DashboardFrontPage from './components/DashboardFrontPage'; // Adjust the path if needed
 import Login from './components/Login';
 import Register from './components/Register';
+import Parents from "./components/Parents";
+import AddEditParent from "./components/AddEditParent";
+import Logout from "./components/Logout";
 
 function App() {
     return (
@@ -30,6 +33,7 @@ function App() {
                 <Route path="/dashboard" element={<DashboardFrontPage />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route path="/logout" element={<Logout />} />
 
                 {/* Attendance Routes */}
                 <Route path="/attendance" element={<Attendance />} />
@@ -69,6 +73,12 @@ function App() {
                 <Route path="/students" element={<Students />} />
                 <Route path="/students/add" element={<AddEditStudent />} />
                 <Route path="/students/edit/:id" element={<AddEditStudent />} />
+
+
+                {/* Students Routes */}
+                <Route path="/Parents" element={<Parents />} />
+                <Route path="/Parents/add" element={<AddEditParent />} />
+                <Route path="/Parents/edit/:id" element={<AddEditParent />} />
 
                 {/* Timetable Route */}
                 <Route path="/timetable" element={<Timetable />} />
