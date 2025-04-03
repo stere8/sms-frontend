@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from './axiosInstance'
 import { useNavigate, useParams } from 'react-router-dom';
 import { BASE_URL } from '../settings';
 import { Form, Button, Container } from 'react-bootstrap';
@@ -23,7 +23,7 @@ const AddEditStudent = () => {
 
         // If editing, fetch the student first
         if (id) {
-          const studentResp = await axios.get(`${BASE_URL}/students/${id}`);
+          const studentResp = await axiosInstance.get(`${BASE_URL}/students/${id}`);
           fetchedStudent = studentResp.data;
           // format the date
           if (fetchedStudent.dateOfBirth) {
@@ -33,7 +33,7 @@ const AddEditStudent = () => {
         }
 
         // Now fetch unlinked users
-        const unlinkedResp = await axios.get(`${BASE_URL}/api/account/student/unlinked`);
+        const unlinkedResp = await axiosInstance.get(`${BASE_URL}/api/account/student/unlinked`);
         let fetchedUsers = unlinkedResp.data; // Array of { id, email }
 
         // If editing & the student has a userId, ensure that user is in the list
@@ -68,9 +68,9 @@ const AddEditStudent = () => {
 
     try {
       if (id) {
-        await axios.put(`${BASE_URL}/students/${id}`, payload);
+        await axiosInstance.put(`${BASE_URL}/students/${id}`, payload);
       } else {
-        await axios.post(`${BASE_URL}/students`, payload);
+        await axiosInstance.post(`${BASE_URL}/students`, payload);
       }
       navigate('/students');
     } catch (error) {

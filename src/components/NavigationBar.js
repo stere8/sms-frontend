@@ -60,8 +60,14 @@ const NavigationBar = () => {
                 <LinkContainer to="/students">
                   <Nav.Link>Students</Nav.Link>
                 </LinkContainer>
+                <LinkContainer to="/parents">
+                  <Nav.Link>Parents</Nav.Link>
+                </LinkContainer>
                 <LinkContainer to="/timetable">
                   <Nav.Link>Timetable</Nav.Link>
+                </LinkContainer>
+                <LinkContainer to="/parent-students">
+                  <Nav.Link>Parent Assignments</Nav.Link>
                 </LinkContainer>
               </>
             )}
@@ -87,6 +93,9 @@ const NavigationBar = () => {
               <>
                 <LinkContainer to="/dashboard">
                   <Nav.Link>Dashboard</Nav.Link>
+                </LinkContainer>
+                <LinkContainer to="/parents/students">
+                  <Nav.Link>My Students</Nav.Link>
                 </LinkContainer>
               </>
             )}

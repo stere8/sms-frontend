@@ -1,37 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from './axiosInstance';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BASE_URL } from '../settings';
 import { Form, Button, Container } from 'react-bootstrap';
 
 const AddEditStaff = () => {
-  const [staff, setStaff] = useState({ firstName: '', lastName: '', email: '', subjectExpertise: '', userId: '' });
+  const [staff, setStaff] = useState({ 
+    firstName: '', 
+    lastName: '', 
+    email: '', 
+    subjectExpertise: '', 
+    userId: ''
+  });
   const [users, setUsers] = useState([]);
   const navigate = useNavigate();
   const { id } = useParams();
 
-  // Fetch unlinked teacher users
   useEffect(() => {
-    axios.get(`${BASE_URL}/api/account/teacher/unlinked`)
-      .then(response => setUsers(response.data))
-      .catch(error => console.error('Error fetching unlinked users:', error));
-  }, []);
+    const loadData = async () => {
+      try {
+        let fetchedTeacher = null;
+        // If editing, fetch the teacher data
+        if (id) {
+          const teacherResp = await axiosInstance.get(`${BASE_URL}/staff/${id}`);
+          fetchedTeacher = teacherResp.data;
+          setStaff(fetchedTeacher);
+        }
 
-  // If editing, fetch existing staff data and add its linked user (if any) to the dropdown list
-  useEffect(() => {
-    if (id) {
-      axios.get(`${BASE_URL}/staff/${id}`)
-        .then(response => {
-          const staffData = response.data;
-          setStaff(staffData);
-          // If there's an already linked user, add it to the list (if not already present)
-          if (staffData.userId && !users.some(u => u.id === staffData.userId)) {
-            setUsers(prevUsers => [...prevUsers, { id: staffData.userId, email: staffData.user?.email || 'Linked User' }]);
+        // Fetch unlinked teacher users
+        const unlinkedResp = await axiosInstance.get(`${BASE_URL}/api/account/teacher/unlinked`);
+        let fetchedUsers = unlinkedResp.data; // Array of { id, email }
+
+        // If editing and the teacher has a userId that is not in the list, add it
+        if (id && fetchedTeacher && fetchedTeacher.userId) {
+          const exists = fetchedUsers.some(u => u.id === fetchedTeacher.userId);
+          if (!exists) {
+            const userEmail = fetchedTeacher.user?.email || 'Assigned User';
+            fetchedUsers.push({ id: fetchedTeacher.userId, email: userEmail });
           }
-        })
-        .catch(error => console.error('Error fetching staff data:', error));
-    }
-  }, [id, users]);
+        }
+        setUsers(fetchedUsers);
+      } catch (error) {
+        console.error('Error fetching data in AddEditStaff:', error);
+      }
+    };
+
+    loadData();
+  }, [id]);
 
   const handleChange = e => {
     const { name, value } = e.target;
@@ -42,10 +57,11 @@ const AddEditStaff = () => {
     e.preventDefault();
     const payload = { ...staff, userId: staff.userId };
     const request = id ?
-      axios.put(`${BASE_URL}/staff/${id}`, payload) :
-      axios.post(`${BASE_URL}/staff`, payload);
+      axiosInstance.put(`${BASE_URL}/staff/${id}`, payload) :
+      axiosInstance.post(`${BASE_URL}/staff`, payload);
 
-    request.then(() => navigate('/staff'))
+    request
+      .then(() => navigate('/staff'))
       .catch(error => console.error('Error saving staff:', error));
   };
 
@@ -98,7 +114,7 @@ const AddEditStaff = () => {
           <Form.Control
             as="select"
             name="userId"
-            value={staff.userId}
+            value={staff.userId || ''}
             onChange={handleChange}
             required
           >

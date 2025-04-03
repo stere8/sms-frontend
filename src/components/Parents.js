@@ -10,7 +10,7 @@ const Parents = () => {
   useEffect(() => {
     const fetchParents = async () => {
       try {
-        const response = await axios.get(`${BASE_URL}/parents`);
+        const response = await axios.get(`${BASE_URL}/api/parents`);
         console.log(response.data);
         setParents(response.data);
       } catch (error) {
@@ -47,7 +47,7 @@ const Parents = () => {
               <td>{parent.firstName}</td>
               <td>{parent.lastName}</td>
               <td>{parent.email}</td>
-              <td>{parent.userId}</td>
+              <td>{parent.studentParents ? parent.studentParents.length : 0}</td>
               <td>
                 <Button as={Link} to={`/parents/edit/${parent.parentId}`} variant="warning">Edit</Button>
                 <Button onClick={() => deleteParent(parent.parentId)} variant="danger">Delete</Button>

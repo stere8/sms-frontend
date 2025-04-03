@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BASE_URL } from '../settings';
 import { Form, Button } from 'react-bootstrap';
+import axiosInstance from './axiosInstance' 
 
 const AddEditTeacherEnrollment = () => {
     const [teachers, setTeachers] = useState([]);
@@ -15,20 +16,20 @@ const AddEditTeacherEnrollment = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axios.get(`${BASE_URL}/staff`)
+        axiosInstance.get(`${BASE_URL}/staff`)
             .then(response => setTeachers(response.data))
             .catch(error => console.error('Error fetching teachers:', error));
 
-        axios.get(`${BASE_URL}/classes`)
+            axiosInstance.get(`${BASE_URL}/classes`)
             .then(response => setClasses(response.data))
             .catch(error => console.error('Error fetching classes:', error));
 
-        axios.get(`${BASE_URL}/lessons`)
+            axiosInstance.get(`${BASE_URL}/lessons`)
             .then(response => setLessons(response.data))
             .catch(error => console.error('Error fetching lessons:', error));
 
         if (id && id !== '0') {
-            axios.get(`${BASE_URL}/teacherenrollments/${id}`)
+            axiosInstance.get(`${BASE_URL}/teacherenrollments/${id}`)
                 .then(response => {
                     setTeacherId(response.data.staffId);
                     setClassId(response.data.classId);
@@ -43,11 +44,11 @@ const AddEditTeacherEnrollment = () => {
         const enrollment = { staffId: teacherId, classId: classId, lessonId: lessonId,TeacherEnrollmentId : id };
 
         if (id && id !== '0') {
-            axios.put(`${BASE_URL}/teacherenrollments/${id}`, enrollment)
+            axiosInstance.put(`${BASE_URL}/teacherenrollments/${id}`, enrollment)
                 .then(() => navigate('/teacher-enrollments'))
                 .catch(error => console.error('Error updating enrollment:', error));
         } else {
-            axios.post(`${BASE_URL}/teacherenrollments`, enrollment)
+            axiosInstance.post(`${BASE_URL}/teacherenrollments`, enrollment)
                 .then(() => navigate('/teacher-enrollments'))
                 .catch(error => console.error('Error creating enrollment:', error));
         }
@@ -81,7 +82,9 @@ const AddEditTeacherEnrollment = () => {
                 </Form.Group>
                 <Form.Group controlId="lessonSelect">
                     <Form.Label>Lesson</Form.Label>
-                    <Form.Control as="select" value={lessonId} onChange={e => setLessonId(e.target.value)} required>
+                    <Form.Control 
+                    as="select" 
+                    value={lessonId} onChange={e => setLessonId(e.target.value)} required>
                         <option value="">Select a lesson</option>
                         {lessons.map(lesson => (
                             <option key={lesson.lessonId} value={lesson.lessonId}>

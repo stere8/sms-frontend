@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Link } from 'react-router-dom';
 import { ListGroup, Container } from 'react-bootstrap';
 import { BASE_URL } from '../settings';
+import axiosInstance from './axiosInstance' 
 
 const Classes = () => {
     const [classes, setClasses] = useState([]);
@@ -10,8 +11,8 @@ const Classes = () => {
     useEffect(() => {
         const fetchClasses = async () => {
             try {
-                const response = await axios.get(`${BASE_URL}/classes`);
-                console.log (response.data);
+                const response = await axiosInstance.get(`${BASE_URL}/classes`);
+                console.log (response);
                 setClasses(response.data);
             } catch (error) {
                 console.error('There was an error fetching the classes!',BASE_URL, error);

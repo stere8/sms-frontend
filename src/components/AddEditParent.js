@@ -3,6 +3,7 @@ import axios from 'axios';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BASE_URL } from '../settings';
 import { Form, Button, Container } from 'react-bootstrap';
+import axiosInstance from './axiosInstance'
 
 const AddEditParent = () => {
   // Parent model: FirstName, LastName, Email, and UserId (for linking the Identity user)
@@ -14,13 +15,13 @@ const AddEditParent = () => {
   // Fetch unlinked Identity users for parents and, if editing, fetch the parent data
   useEffect(() => {
     // Get unlinked Identity users for parents.
-    axios.get(`${BASE_URL}/api/account/parent/unlinked`)
+    axiosInstance.get(`${BASE_URL}/api/account/parent/unlinked`)
       .then(response => setUsers(response.data))
       .catch(error => console.error('Error fetching unlinked users:', error));
 
     // If editing an existing parent, load its data.
     if (id) {
-      axios.get(`${BASE_URL}/parents/${id}`)
+      axios.get(`${BASE_URL}/api/parents/${id}`)
         .then(response => setParent(response.data))
         .catch(error => console.error('Error fetching parent data:', error));
     }
@@ -34,11 +35,11 @@ const AddEditParent = () => {
   const handleSubmit = e => {
     e.preventDefault();
     if (id) {
-      axios.put(`${BASE_URL}/parents/${id}`, parent)
+      axiosInstance.put(`${BASE_URL}/api/parents/${id}`, parent)
         .then(() => navigate('/parents'))
         .catch(error => console.error('Error updating parent:', error));
     } else {
-      axios.post(`${BASE_URL}/parents`, parent)
+      axiosInstance.post(`${BASE_URL}/api/parents`, parent)
         .then(() => navigate('/parents'))
         .catch(error => console.error('Error adding parent:', error));
     }

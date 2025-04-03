@@ -10,6 +10,7 @@ import Staff from './components/Staff';
 import Students from './components/Students';
 import Timetable from './components/Timetable';
 import AddEditStudent from './components/AddEditStudent';
+import StudentView from './components/StudentView'; 
 import AddEditStaff from './components/AddEditStaff';
 import AddEditEnrollment from './components/AddEditEnrollment';
 import AddEditTeacherEnrollment from './components/AddEditTeacherEnrollment';
@@ -22,6 +23,9 @@ import Login from './components/Login';
 import Register from './components/Register';
 import Parents from "./components/Parents";
 import AddEditParent from "./components/AddEditParent";
+import AdminParentAssignments from './components/AdminParentAssignment';
+import AddParentStudentAssignment from './components/AddParentStudentAssignment';
+import MyStudents from './components/MyStudents'
 import Logout from "./components/Logout";
 
 function App() {
@@ -73,7 +77,12 @@ function App() {
                 <Route path="/students" element={<Students />} />
                 <Route path="/students/add" element={<AddEditStudent />} />
                 <Route path="/students/edit/:id" element={<AddEditStudent />} />
+                <Route path="/students/view/:id" element={<StudentView />} />
 
+
+                <Route path="/parent-students" element={<AdminParentAssignments />} />
+                <Route path="/parents/students" element={<MyStudents />} />
+                <Route path="/parent-student/add" element={<AddParentStudentAssignment />} />
 
                 {/* Students Routes */}
                 <Route path="/Parents" element={<Parents />} />
