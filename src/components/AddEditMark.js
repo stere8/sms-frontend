@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from './axiosInstance';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BASE_URL } from '../settings';
 import { Form, Button, Container } from 'react-bootstrap';
@@ -12,16 +12,16 @@ const AddEditMark = () => {
     const { id } = useParams();
 
     useEffect(() => {
-        axios.get(`${BASE_URL}/students`)
+        axiosInstance.get(`${BASE_URL}/api/students`)
             .then(response => setStudents(response.data))
             .catch(error => console.error('Error fetching students:', error));
 
-        axios.get(`${BASE_URL}/lessons`)
+        axiosInstance.get(`${BASE_URL}/api/lessons`)
             .then(response => setLessons(response.data))
             .catch(error => console.error('Error fetching lessons:', error));
 
         if (id) {
-            axios.get(`${BASE_URL}/marks/${id}`)
+            axiosInstance.get(`${BASE_URL}/api/marks/${id}`)
                 .then(response => {
                     const markData = response.data;
                     markData.date = markData.date.split('T')[0]; // Format date as yyyy-mm-dd
@@ -39,11 +39,11 @@ const AddEditMark = () => {
     const handleSubmit = e => {
         e.preventDefault();
         if (id) {
-            axios.put(`${BASE_URL}/marks/${id}`, mark)
+            axiosInstance.put(`${BASE_URL}/api/marks/${id}`, mark)
                 .then(() => navigate('/marks'))
                 .catch(error => console.error('Error updating mark:', error));
         } else {
-            axios.post(`${BASE_URL}/marks`, mark)
+            axiosInstance.post(`${BASE_URL}/api/marks`, mark)
                 .then(() => navigate('/marks'))
                 .catch(error => console.error('Error adding mark:', error));
         }

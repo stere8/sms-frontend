@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axiosInstance from './axiosInstance'
+import axiosInstance from './axiosInstance';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BASE_URL } from '../settings';
 import { Form, Button, Container } from 'react-bootstrap';
@@ -16,16 +16,15 @@ const AddEditStudent = () => {
   const { id } = useParams();
 
   useEffect(() => {
-    // Wrap everything in an async function
     const loadData = async () => {
       try {
         let fetchedStudent = null;
 
         // If editing, fetch the student first
         if (id) {
-          const studentResp = await axiosInstance.get(`${BASE_URL}/students/${id}`);
+          const studentResp = await axiosInstance.get(`${BASE_URL}/api/students/${id}`);
           fetchedStudent = studentResp.data;
-          // format the date
+          // Format the date (yyyy-mm-dd)
           if (fetchedStudent.dateOfBirth) {
             fetchedStudent.dateOfBirth = fetchedStudent.dateOfBirth.split('T')[0];
           }
@@ -34,21 +33,23 @@ const AddEditStudent = () => {
 
         // Now fetch unlinked users
         const unlinkedResp = await axiosInstance.get(`${BASE_URL}/api/account/student/unlinked`);
-        let fetchedUsers = unlinkedResp.data; // Array of { id, email }
-
+        let fetchedUsers = unlinkedResp.data;
+        // Check if fetchedUsers is an array; if not, extract it from $values or a similar property.
+        const usersArray = Array.isArray(fetchedUsers)
+          ? fetchedUsers
+          : fetchedUsers.$values || [];
+        
         // If editing & the student has a userId, ensure that user is in the list
         if (id && fetchedStudent && fetchedStudent.userId) {
-          // Check if that user is already in the unlinked list
-          const exists = fetchedUsers.some(u => u.id === fetchedStudent.userId);
+          const exists = usersArray.some(u => u.id === fetchedStudent.userId);
           if (!exists) {
-            // We can guess the student's user email if we have it
-            // If the student object has `user` or `email`, use that; otherwise use a placeholder
+            // Use student's user email if available, otherwise use a placeholder
             const userEmail = fetchedStudent.user?.email || 'Assigned User';
-            fetchedUsers.push({ id: fetchedStudent.userId, email: userEmail });
+            usersArray.push({ id: fetchedStudent.userId, email: userEmail });
           }
         }
 
-        setUsers(fetchedUsers);
+        setUsers(usersArray);
       } catch (error) {
         console.error('Error loading data:', error);
       }
@@ -65,12 +66,11 @@ const AddEditStudent = () => {
   const handleSubmit = async e => {
     e.preventDefault();
     const payload = { ...student };
-
     try {
       if (id) {
-        await axiosInstance.put(`${BASE_URL}/students/${id}`, payload);
+        await axiosInstance.put(`${BASE_URL}/api/students/${id}`, payload);
       } else {
-        await axiosInstance.post(`${BASE_URL}/students`, payload);
+        await axiosInstance.post(`${BASE_URL}/api/students`, payload);
       }
       navigate('/students');
     } catch (error) {
@@ -120,7 +120,7 @@ const AddEditStudent = () => {
           <Form.Control
             as="select"
             name="userId"
-            value={student.userId || ''} // ensure it's a string or ''
+            value={student.userId || ''}
             onChange={handleChange}
           >
             <option value="">Select a user</option>

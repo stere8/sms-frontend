@@ -22,7 +22,7 @@ const AddEditStaff = () => {
         let fetchedTeacher = null;
         // If editing, fetch the teacher data
         if (id) {
-          const teacherResp = await axiosInstance.get(`${BASE_URL}/staff/${id}`);
+          const teacherResp = await axiosInstance.get(`${BASE_URL}/api/staff/${id}`);
           fetchedTeacher = teacherResp.data;
           setStaff(fetchedTeacher);
         }
@@ -57,8 +57,8 @@ const AddEditStaff = () => {
     e.preventDefault();
     const payload = { ...staff, userId: staff.userId };
     const request = id ?
-      axiosInstance.put(`${BASE_URL}/staff/${id}`, payload) :
-      axiosInstance.post(`${BASE_URL}/staff`, payload);
+      axiosInstance.put(`${BASE_URL}/api/staff/${id}`, payload) :
+      axiosInstance.post(`${BASE_URL}/api/staff`, payload);
 
     request
       .then(() => navigate('/staff'))

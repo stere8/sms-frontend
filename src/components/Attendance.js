@@ -1,81 +1,123 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-import { Table, Button } from 'react-bootstrap';
+import axiosInstance from './axiosInstance';
+import { Link, useNavigate } from 'react-router-dom';
+import { Table, Button, Alert, Spinner, Card } from 'react-bootstrap';
 import { BASE_URL } from '../settings';
 
 const Attendance = () => {
     const [attendance, setAttendance] = useState([]);
     const [students, setStudents] = useState([]);
     const [lessons, setLessons] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const fetchAttendanceData = async () => {
+        const fetchData = async () => {
             try {
-                const attendanceResponse = await axios.get(`${BASE_URL}/attendance`);
-                const studentsResponse = await axios.get(`${BASE_URL}/students`);
-                const lessonsResponse = await axios.get(`${BASE_URL}/lessons`);
-
-                setAttendance(attendanceResponse.data);
-                setStudents(studentsResponse.data);
-                setLessons(lessonsResponse.data);
-            } catch (error) {
-                console.error('There was an error fetching the data!', error);
+                const [attendanceRes, studentsRes, lessonsRes] = await Promise.all([
+                    axiosInstance.get(`${BASE_URL}/api/attendance`),
+                    axiosInstance.get(`${BASE_URL}/api/students`),
+                    axiosInstance.get(`${BASE_URL}/api/lessons`)
+                ]);
+                
+                // Check if attendance data exists and is not empty
+                if (attendanceRes.data && attendanceRes.data.length > 0) {
+                    setAttendance(attendanceRes.data);
+                }
+                setStudents(studentsRes.data);
+                setLessons(lessonsRes.data);
+            } catch (err) {
+                setError('Failed to load data');
+                console.error('Error:', err);
+            } finally {
+                setLoading(false);
             }
         };
 
-        fetchAttendanceData();
+        fetchData();
     }, []);
 
-    const deleteAttendance = (id) => {
-        axios.delete(`${BASE_URL}/attendance/${id}`)
-            .then(() => setAttendance(attendance.filter(record => record.attendanceId !== id)))
-            .catch(error => console.error('Error deleting attendance record:', error));
+    const deleteAttendance = async (id) => {
+        try {
+            await axiosInstance.delete(`${BASE_URL}/api/attendance/${id}`);
+            setAttendance(attendance.filter(record => record.attendanceId !== id));
+        } catch (error) {
+            setError('Failed to delete record');
+            console.error('Error:', error);
+        }
     };
 
     const getStudentNameById = (id) => {
-        const student = students.find(student => student.studentId === id);
-        return student ? `${student.firstName} ${student.lastName}` : 'Unknown Student';
+        const student = students.find(s => s.studentId === id);
+        return student ? `${student.firstName} ${student.lastName}` : 'Unknown';
     };
 
     const getLessonNameById = (id) => {
-        const lesson = lessons.find(lesson => lesson.lessonId === id);
-        return lesson ? lesson.name : 'Unknown Lesson';
+        const lesson = lessons.find(l => l.lessonId === id);
+        return lesson ? lesson.name : 'Unknown';
     };
 
     const formatDate = (dateString) => {
-        return dateString.split('T')[0]; // Removes the 'T00:00:00' part
+        return dateString ? new Date(dateString).toLocaleDateString() : '';
     };
 
+    if (loading) return <Spinner animation="border" />;
+    if (error) return <Alert variant="danger">{error}</Alert>;
+
     return (
-        <div>
-            <h1>Attendance Records</h1>
-            <Button as={Link} to="/attendance/add" variant="primary">Add Attendance Record</Button>
-            <Table striped bordered hover>
-                <thead>
-                    <tr>
-                        <th>Student</th>
-                        <th>Lesson</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {attendance.map(record => (
-                        <tr key={record.attendanceId}>
-                            <td>{getStudentNameById(record.studentId)}</td>
-                            <td>{getLessonNameById(record.lessonId)}</td>
-                            <td>{formatDate(record.date)}</td>
-                            <td>{record.status}</td>
-                            <td>
-                                <Button as={Link} to={`/attendance/edit/${record.attendanceId}`} variant="warning">Edit</Button>
-                                <Button onClick={() => deleteAttendance(record.attendanceId)} variant="danger">Delete</Button>
-                            </td>
+        <div className="p-4">
+            <h1 className="mb-4">Attendance Records</h1>
+            <Button as={Link} to="/api/attendance/add" variant="primary" className="mb-4">
+                Add New Record
+            </Button>
+            
+            {attendance.length > 0 ? (
+                <Table striped bordered hover responsive>
+                    <thead className="thead-dark">
+                        <tr>
+                            <th>Student</th>
+                            <th>Lesson</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Actions</th>
                         </tr>
-                    ))}
-                </tbody>
-            </Table>
+                    </thead>
+                    <tbody>
+                        {attendance.map(record => (
+                            <tr key={record.attendanceId}>
+                                <td>{getStudentNameById(record.studentId)}</td>
+                                <td>{getLessonNameById(record.lessonId)}</td>
+                                <td>{formatDate(record.date)}</td>
+                                <td>{record.status}</td>
+                                <td>
+                                    <Button 
+                                        variant="warning" 
+                                        size="sm" 
+                                        onClick={() => navigate(`/attendance/edit/${record.attendanceId}`)}
+                                        className="me-2"
+                                    >
+                                        Edit
+                                    </Button>
+                                    <Button 
+                                        variant="danger" 
+                                        size="sm"
+                                        onClick={() => deleteAttendance(record.attendanceId)}
+                                    >
+                                        Delete
+                                    </Button>
+                                </td>
+                            </tr>
+                        ))}
+                    </tbody>
+                </Table>
+            ) : (
+                <Card>
+                    <Card.Body>
+                        <Card.Text>No attendance records found.</Card.Text>
+                    </Card.Body>
+                </Card>
+            )}
         </div>
     );
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
+import axiosInstance from './axiosInstance';
 import { useNavigate, useParams } from 'react-router-dom';
 import { BASE_URL } from '../settings';
 import { Form, Button } from 'react-bootstrap';
@@ -13,16 +13,16 @@ const AddEditEnrollment = () => {
     const { id } = useParams();
 
     useEffect(() => {
-        axios.get(`${BASE_URL}/classes`)
+        axiosInstance.get(`${BASE_URL}/api/classes`)
             .then(response => setClasses(response.data))
             .catch(error => console.error('Error fetching classes:', error));
 
-        axios.get(`${BASE_URL}/students`)
+        axiosInstance.get(`${BASE_URL}/api/students`)
             .then(response => setStudents(response.data))
             .catch(error => console.error('Error fetching students:', error));
 
         if (id) {
-            axios.get(`${BASE_URL}/enrollments/${id}`)
+            axiosInstance.get(`${BASE_URL}/api/enrollments/${id}`)
                 .then(response => {
                     setClassId(response.data.classId);
                     setStudentId(response.data.studentId);
@@ -37,11 +37,11 @@ const AddEditEnrollment = () => {
         const enrollmentData = { classId, studentId, enrollmentId: id };
 
         if (id) {
-            axios.put(`${BASE_URL}/enrollments/${id}`, enrollmentData)
+            axiosInstance.put(`${BASE_URL}/api/enrollments/${id}`, enrollmentData)
                 .then(() => navigate('/enrollments'))  // Correct usage of navigate
                 .catch(error => console.error('Error updating enrollment:', error));
         } else {
-            axios.post(`${BASE_URL}/enrollments`, enrollmentData)
+            axiosInstance.post(`${BASE_URL}/api/enrollments`, enrollmentData)
                 .then(() => navigate('/enrollments'))  // Correct usage of navigate
                 .catch(error => console.error('Error adding enrollment:', error));
         }
