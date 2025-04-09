@@ -109,11 +109,11 @@ const ParentDashboard = ({ data }) => {
 
 const renderTeacherDashBoardView = (data) => {
   // Check if data exists and has keys
-  if (!data || Object.keys(data).length === 0) {
+  if (!data || data.length === 0) {
     return <div>No data available.</div>;
   }
 
-  const { classes, schedule, subject } = data[0];
+  const { classes, schedule, subject } = data[0] || {};
 
   return (
     <div>

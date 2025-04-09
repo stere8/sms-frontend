@@ -20,34 +20,42 @@ const AddEditStaff = () => {
     const loadData = async () => {
       try {
         let fetchedTeacher = null;
-        // If editing, fetch the teacher data
+  
+        // 1) If editing, fetch the teacher data
         if (id) {
           const teacherResp = await axiosInstance.get(`${BASE_URL}/api/staff/${id}`);
           fetchedTeacher = teacherResp.data;
           setStaff(fetchedTeacher);
         }
-
-        // Fetch unlinked teacher users
+  
+        // 2) Fetch unlinked teacher users
         const unlinkedResp = await axiosInstance.get(`${BASE_URL}/api/account/teacher/unlinked`);
-        let fetchedUsers = unlinkedResp.data; // Array of { id, email }
-
-        // If editing and the teacher has a userId that is not in the list, add it
+        let fetchedUsers = Array.isArray(unlinkedResp.data) ? unlinkedResp.data : [];
+        console.log('Unlinked users:', unlinkedResp);
+        // 3) If editing and the teacher has a linked user,
+        // add that user into the list if not already present.
         if (id && fetchedTeacher && fetchedTeacher.userId) {
           const exists = fetchedUsers.some(u => u.id === fetchedTeacher.userId);
           if (!exists) {
-            const userEmail = fetchedTeacher.user?.email || 'Assigned User';
-            fetchedUsers.push({ id: fetchedTeacher.userId, email: userEmail });
+            // Use the teacher's existing email if available; otherwise a fallback.
+            const teacherEmail = fetchedTeacher.user?.email || 'Assigned User';
+            fetchedUsers.push({ id: fetchedTeacher.userId, email: teacherEmail });
           }
         }
+  
+        // 4) Log the final array for debugging purposes.
+        console.log('Final unlinked teacher users:', fetchedUsers);
+  
+        // 5) Update state with the final list
         setUsers(fetchedUsers);
       } catch (error) {
         console.error('Error fetching data in AddEditStaff:', error);
       }
     };
-
+  
     loadData();
   }, [id]);
-
+  
   const handleChange = e => {
     const { name, value } = e.target;
     setStaff(prevState => ({ ...prevState, [name]: value }));
@@ -56,9 +64,9 @@ const AddEditStaff = () => {
   const handleSubmit = e => {
     e.preventDefault();
     const payload = { ...staff, userId: staff.userId };
-    const request = id ?
-      axiosInstance.put(`${BASE_URL}/api/staff/${id}`, payload) :
-      axiosInstance.post(`${BASE_URL}/api/staff`, payload);
+    const request = id
+      ? axiosInstance.put(`${BASE_URL}/api/staff/${id}`, payload)
+      : axiosInstance.post(`${BASE_URL}/api/staff`, payload);
 
     request
       .then(() => navigate('/staff'))
@@ -116,7 +124,6 @@ const AddEditStaff = () => {
             name="userId"
             value={staff.userId || ''}
             onChange={handleChange}
-            required
           >
             <option value="">Select a user</option>
             {users.map(user => (

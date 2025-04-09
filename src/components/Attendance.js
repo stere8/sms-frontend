@@ -20,7 +20,9 @@ const Attendance = () => {
                     axiosInstance.get(`${BASE_URL}/api/students`),
                     axiosInstance.get(`${BASE_URL}/api/lessons`)
                 ]);
-                
+                const token = localStorage.getItem("teacherId");
+                console.log('Attendance:', attendanceRes.data);
+                console.log('Students:', token);
                 // Check if attendance data exists and is not empty
                 if (attendanceRes.data && attendanceRes.data.length > 0) {
                     setAttendance(attendanceRes.data);
@@ -68,7 +70,7 @@ const Attendance = () => {
     return (
         <div className="p-4">
             <h1 className="mb-4">Attendance Records</h1>
-            <Button as={Link} to="/api/attendance/add" variant="primary" className="mb-4">
+            <Button as={Link} to="/attendance/add" variant="primary" className="mb-4">
                 Add New Record
             </Button>
             
