@@ -74,29 +74,39 @@ const TeacherDashboard = ({ data }) => {
 
 // Inline view for the Parent role
 const ParentDashboard = ({ data }) => {
-  if (!data || data.length === 0) {
+  // 1) Unwrap the data into a true array
+  const students = Array.isArray(data)
+    ? data
+    : Array.isArray(data?.$values)
+      ? data.$values
+      : [];
+
+  // 2) If no students, show a warning
+  if (students.length === 0) {
     return (
       <Alert variant="warning" className="m-3">
         <h3>No Students Linked</h3>
-        <p className="mb-0">
-          Your account isn't associated with any students. Please contact the school office.
-        </p>
+        <p>Your account isn't associated with any students. Please contact the school office.</p>
       </Alert>
     );
   }
 
+  // 3) Render the student cards
   return (
     <Container className="dashboard-section">
       <h2 className="mb-4">Linked Students</h2>
       <div className="row">
-        {data.map(student => (
+        {students.map(student => (
           <div key={student.studentId} className="col-md-4 mb-3">
             <Card>
               <Card.Body>
-                <Card.Title>{student.firstName} {student.lastName}</Card.Title>
+                <Card.Title>
+                  {student.firstName} {student.lastName}
+                </Card.Title>
                 <Card.Text>
-                  Class: {student.className}<br />
-                  Grade: {student.gradeLevel}
+                  Class: {student.className ?? "—"}<br />
+                  Grade: {student.gradeLevel ?? "—"}<br />
+                  Year: {student.year ?? "—"}
                 </Card.Text>
               </Card.Body>
             </Card>
@@ -108,6 +118,7 @@ const ParentDashboard = ({ data }) => {
 };
 
 const renderTeacherDashBoardView = (data) => {
+  console.log("Teacher Dashboard Data:", data[0]); // Debugging line to check fetched data
   // Check if data exists and has keys
   if (!data || data.length === 0) {
     return <div>No data available.</div>;
@@ -115,15 +126,18 @@ const renderTeacherDashBoardView = (data) => {
 
   const { classes, schedule, subject } = data[0] || {};
 
+  console.log("Classes:", classes); // Debugging line to check classes
+  console.log("Schedule:", schedule); // Debugging line to check schedule
+  console.log("Subjects:", subject); // Debugging line to check subjects
   return (
     <div>
       <h2>Teacher Dashboard</h2>
 
       {/* Display assigned classes */}
       <h3>Assigned Classes</h3>
-      {classes && classes.length > 0 ? (
+      {classes.$values && classes.$values.length > 0 ? (
         <ul>
-          {classes.map(cls => (
+          {classes.$values.map(cls => (
             <li key={cls.classId}>
               {cls.name} - Grade {cls.gradeLevel} ({cls.year})
             </li>
@@ -135,7 +149,7 @@ const renderTeacherDashBoardView = (data) => {
 
       {/* Display schedule */}
       <h3>Schedule</h3>
-      {schedule && schedule.length > 0 ? (
+      {schedule.$values && schedule.$values.length > 0 ? (
         <table border="1" cellPadding="5" cellSpacing="0">
           <thead>
             <tr>
@@ -145,9 +159,9 @@ const renderTeacherDashBoardView = (data) => {
             </tr>
           </thead>
           <tbody>
-            {schedule.map(item => {
+            {schedule.$values.map(item => {
               // Find the subject details matching the lessonId.
-              const subj = subject.find(s => s.lessonId === item.lessonId);
+              const subj = subject.$values.find(s => s.lessonId === item.lessonId);
               return (
                 <tr key={item.timetableId}>
                   <td>{item.dayOfWeek}</td>
@@ -170,6 +184,7 @@ const renderTeacherDashBoardView = (data) => {
 // Inline view for the Student role (integrated directly)
 const renderStudentDashboardView = (data) =>
   {
+    console.log("Student Dashboard Data:", data); // Debugging line to check fetched data
   // Define time slots and days for the timetable
   const timeSlots = [
     { start: "08:00", end: "09:00" },
@@ -184,6 +199,7 @@ const renderStudentDashboardView = (data) =>
 
   // Generate a timetable object from the timetable data provided in classData.classTimetable
   const generateTimetable = (timetableData) => {
+    console.log("Timetable Data:", timetableData); // Debugging line to check timetable data
     const timetable = {};
     days.forEach(day => {
       timetable[day] = {};
@@ -221,8 +237,9 @@ const renderStudentDashboardView = (data) =>
   }
 
   // Generate timetable using the nested property
-  const timetable = generateTimetable(data.classData.classTimetable);
-
+  const timetable = generateTimetable(data.classData.classTimetable.$values);
+  console.log("Generated Timetable:", timetable.length); // Debugging line to check generated timetable
+  console.log("Timetable:", data.classData); // Debugging line to check class data
   return (
     <Container className="dashboard-section">
       {/* Class Information */}
@@ -242,7 +259,7 @@ const renderStudentDashboardView = (data) =>
       </Card>
 
       {/* Timetable Section */}
-      {data.classData.classTimetable?.length > 0 && (
+      {!isEmpty > 0 && (
         <>
           <h2 className="mb-4">Weekly Timetable</h2>
           <Table striped bordered hover className="mb-5">
@@ -407,8 +424,8 @@ const DashboardFrontPage = () => {
       {!loading && !error && (
         <>
           {userRole === "Admin" && <AdminDashboard data={dashboardData} />}
-          {userRole === "Teacher" && renderTeacherDashBoardView(dashboardData)}
-          {userRole === "Parent" && <ParentDashboard data={dashboardData} />}
+          {userRole === "Teacher" && renderTeacherDashBoardView(dashboardData.$values)}
+          {userRole === "Parent" && <ParentDashboard data={dashboardData.$values} />}
           {(userRole === "Student" || !userRole) && renderStudentDashboardView(dashboardData)}
         </>
       )}

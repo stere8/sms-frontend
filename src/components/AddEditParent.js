@@ -15,13 +15,14 @@ const AddEditParent = () => {
   useEffect(() => {
     // Get unlinked Identity users for parents.
     axiosInstance.get(`${BASE_URL}/api/account/parent/unlinked`)
-      .then(response => setUsers(response.data))
+      .then(response => setUsers(response.data.$values))
       .catch(error => console.error('Error fetching unlinked users:', error));
+      console.log('Fetched user data:', users);
 
     // If editing an existing parent, load its data.
     if (id) {
       axiosInstance.get(`${BASE_URL}/api/parents/${id}`)
-        .then(response => setParent(response.data))
+        .then(response => setParent(response.data.$values))
         .catch(error => console.error('Error fetching parent data:', error));
     }
   }, [id]);
@@ -38,6 +39,7 @@ const AddEditParent = () => {
         .then(() => navigate('/parents'))
         .catch(error => console.error('Error updating parent:', error));
     } else {
+      console.log('Adding new parent:', parent);
       axiosInstance.post(`${BASE_URL}/api/parents`, parent)
         .then(() => navigate('/parents'))
         .catch(error => console.error('Error adding parent:', error));
@@ -91,7 +93,7 @@ const AddEditParent = () => {
           >
             <option value="">Select a user</option>
             {users.map(user => (
-              <option key={user.id} value={user.id}>
+              <option key={user.identityUserId} value={user.identityUserId}>
                 {user.email}
               </option>
             ))}

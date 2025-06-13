@@ -15,20 +15,20 @@ const AddEditTeacherEnrollment = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        axiosInstance.get(`${BASE_URL}/staff`)
+        axiosInstance.get(`${BASE_URL}/api/staff`)
             .then(response => setTeachers(response.data))
             .catch(error => console.error('Error fetching teachers:', error));
 
-            axiosInstance.get(`${BASE_URL}/classes`)
+            axiosInstance.get(`${BASE_URL}/api/classes`)
             .then(response => setClasses(response.data))
             .catch(error => console.error('Error fetching classes:', error));
 
-            axiosInstance.get(`${BASE_URL}/lessons`)
+            axiosInstance.get(`${BASE_URL}/api/lessons`)
             .then(response => setLessons(response.data))
             .catch(error => console.error('Error fetching lessons:', error));
 
         if (id && id !== '0') {
-            axiosInstance.get(`${BASE_URL}/teacherenrollments/${id}`)
+            axiosInstance.get(`${BASE_URL}/api/teacherenrollments/${id}`)
                 .then(response => {
                     setTeacherId(response.data.staffId);
                     setClassId(response.data.classId);
@@ -36,6 +36,8 @@ const AddEditTeacherEnrollment = () => {
                 })
                 .catch(error => console.error('Error fetching enrollment:', error));
         }
+
+        console.log(teachers, classes, lessons); // Debugging line to check fetched data
     }, [id]);
 
     const handleSubmit = event => {
@@ -72,11 +74,11 @@ const AddEditTeacherEnrollment = () => {
                     <Form.Label>Class</Form.Label>
                     <Form.Control as="select" value={classId} onChange={e => setClassId(e.target.value)} required>
                         <option value="">Select a class</option>
-                        {classes.map(classItem => (
-                            <option key={classItem.viewedClass.classId} value={classItem.viewedClass.classId}>
-                                {classItem.viewedClass.name}
-                            </option>
-                        ))}
+                        {classes.map(c => (
+  <option key={c.classId} value={c.classId}>
+    {c.name}
+  </option>
+))}
                     </Form.Control>
                 </Form.Group>
                 <Form.Group controlId="lessonSelect">

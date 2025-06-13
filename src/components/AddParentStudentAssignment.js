@@ -21,10 +21,10 @@ const AddParentStudentAssignment = () => {
     const fetchData = async () => {
       try {
         const parentsResp = await axiosInstance.get(`${BASE_URL}/api/parents`);
-        setParents(parentsResp.data);
+        setParents(parentsResp.data.$values);
 
         const studentsResp = await axiosInstance.get(`${BASE_URL}/api/students`);
-        setStudents(studentsResp.data);
+        setStudents(studentsResp.data.$values);
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("Failed to load parents and students data");
